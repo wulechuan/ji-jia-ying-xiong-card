@@ -278,7 +278,7 @@ window.cardCodesManager = {
 
     $updateOneBitDOM(bitDOM, bitNewState) {
         const bitOldState = bitDOM.dataset.state
-        console.log(`${bitOldState} --> ${bitNewState}`)
+        // console.log(`${bitOldState} --> ${bitNewState}`)
         if (bitOldState === bitNewState) {
             return
         }
@@ -310,7 +310,6 @@ window.cardCodesManager = {
             bitNewState = valueOfEmptyState
         }
 
-        console.log(borderIndex, bitIndex, bitDOM)
         this.$updateOneBitDOM(bitDOM, bitNewState)
     },
 
