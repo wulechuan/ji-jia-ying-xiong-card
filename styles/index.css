@@ -161,9 +161,9 @@ button:focus {
 /* .card .border {
     transition-property: transform;
     transition-duration: 0.6s;
-    transition-timing-function: linear;
-} */
-/* 
+    transition-timing-function: ease-out;
+}
+
 .card .border-top {
     background-color: pink;
 }

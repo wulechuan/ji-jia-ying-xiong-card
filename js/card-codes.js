@@ -8,16 +8,23 @@ window.cardCodesManager = {
         borderDotOfFilled: 'filled',
     },
 
+    domSelectors: {
+        root: '.card .frame',
+        jiJiaPreview: '.card .frame .ji-jia-preview',
+    },
+
     el: {
-        rootSelector: '.card .frame',
-        cardPreviewSelector: '.card .frame .ji-jia-preview',
         // root: null,
         // cardPreviewDOM: null,
     },
 
-    data: {
+    options: {
         intervalInSeconds: 30,
+    },
+
+    data: {
         triedCodes: [],
+        knownCardCodeFixedValues: null,
     },
 
     status: {
@@ -29,9 +36,9 @@ window.cardCodesManager = {
         shouldStartIntervalAtBeginning,
         initialKnownCardCodeName,
     }) {
-        const { el } = this
-        const rootDOM = document.querySelector(el.rootSelector)
-        const cardPreviewDOM = document.querySelector(el.cardPreviewSelector)
+        const { domSelectors, el } = this
+        const rootDOM = document.querySelector(domSelectors.root)
+        const cardPreviewDOM = document.querySelector(domSelectors.jiJiaPreview)
 
         if (!rootDOM) {
             console.error('Failed to get DOM root.')
@@ -44,8 +51,11 @@ window.cardCodesManager = {
 
         el.root = rootDOM
         el.cardPreviewDOM = cardPreviewDOM
+
+
         this.parseRawKnownCardCodes(knownCardCodeStrings)
         this.buildCardBordersViaKnownCardCodeName(initialKnownCardCodeName)
+
         shouldStartIntervalAtBeginning && this.startInterval()
 
         return true
@@ -77,9 +87,7 @@ window.cardCodesManager = {
 
         this.data.knownCardCodes = parsedKnownCardCodes
 
-        if (knownCardCodeNames.length <= 3) {
-            this.data.knownCardCodeFixedValues = null
-        } else {
+        if (knownCardCodeNames.length > 3) {
             const firstParsedCode = parsedKnownCardCodes[knownCardCodeNames[0]]
             const consistantCodeValues = [
                 [...firstParsedCode[0]],
@@ -120,7 +128,7 @@ window.cardCodesManager = {
 
         this.status.intervalId = setInterval(
             this.buildCardBordersViaRandomCodes.bind(this),
-            this.data.intervalInSeconds * 1000
+            this.options.intervalInSeconds * 1000
         )
     },
 
