@@ -7,6 +7,10 @@ html {
     justify-content: center;
 }
 
+#app h1 {
+    text-align: center
+}
+
 .controls {
     margin: 2rem auto;
     text-align: center;
@@ -166,9 +170,10 @@ button:disabled {
     width: 2rem;
     height: 1rem;
     overflow: hidden;
+    cursor: pointer;
 }
 
-.card .border-dot.filled::before {
+.card .border-dot::before {
     content: '';
     display: block;
     width: 1.1rem;
@@ -176,11 +181,24 @@ button:disabled {
     left: 0;
     top: 0;
     margin: -0.1rem;
+}
+
+.card .border-dot.filled::before {
     background-color: black;
 }
 
-.card .border-dot.empty {
-    background-color: transparent;
+
+
+.card .border-dot:hover {
+    background-color: rgba(0, 0, 0, 0.05)
+}
+
+.card .border-dot:hover.filled::before {
+    background-color: rgba(0, 0, 0, 0.05)
+}
+
+.card .border-dot:hover.empty::before {
+    background-color: rgba(0, 0, 0, 0.515)
 }
 
 

@@ -3,9 +3,9 @@ window.cardCodesManager = {
         bordersCommon: 'border',
         bordersNamePrefix: 'border-',
         borderNames: ['top', 'right', 'bottom', 'left'],
-        borderDotsCommon: 'border-dot',
-        borderDotOfEmpty: 'empty',
-        borderDotOfFilled: 'filled',
+        cardBitCommon: 'border-dot',
+        cardBitEmpty: 'empty',
+        cardBitFilled: 'filled',
     },
 
     domSelectors: {
@@ -103,14 +103,17 @@ window.cardCodesManager = {
         el.buttonForShowingNextTriedRandomCode = buttonDOMForShowingNextTriedRandomCode
         el.valueSlotOfShowingIndexOfTriedRandomCodes = valueSlotDOM
 
-
-        this.parseRawKnownCardCodes(knownCardCodeStrings)
-        this.buildCardBordersViaKnownCardCodeName(initialKnownCardCodeName)
-        this.$updateTriedRandomCodesUIStatus(0)
-
         buttonDOMForTryingAnotherRandomCardCode.addEventListener('click', this.buildCardBordersViaRandomCodes.bind(this))
         buttonDOMForShowingPrevTriedRandomCode.addEventListener('click', this.gotoPrevTriedRandomCodes.bind(this))
         buttonDOMForShowingNextTriedRandomCode.addEventListener('click', this.gotoNextTriedRandomCodes.bind(this))
+
+
+
+        this.parseRawKnownCardCodes(knownCardCodeStrings)
+        this.$createCardCodeDOMs()
+        this.$updateTriedRandomCodesUIStatus()
+
+
 
         intervalInSeconds = parseFloat(intervalInSeconds)
         if (intervalInSeconds > 0) {
@@ -118,7 +121,10 @@ window.cardCodesManager = {
         }
 
         if (shouldStartIntervalAtBeginning) {
+            this.buildCardBordersViaRandomCodes()
             this.startInterval()
+        } else {
+            this.buildCardBordersViaKnownCardCodeName(initialKnownCardCodeName)
         }
 
         return true
@@ -236,6 +242,122 @@ window.cardCodesManager = {
         }
     },
 
+    $createCardCodeDOMs() {
+        const nine = '123456789'.split('')
+        const four = nine.slice(0, 4)
+
+        const {
+            bordersNamePrefix,
+            borderNames,
+            cardBitCommon: bitsCommonClassName,
+            cardBitEmpty: classNameOfEmptyBit,
+        } = this.classNames
+
+        const rootDOM = this.el.root
+
+        const bitDOMs = four.map((fakeBorder, borderIndex) => {
+            const borderName = borderNames[borderIndex]
+            const borderDOM = rootDOM.querySelector(`.${bordersNamePrefix}${borderName}`)
+
+            return nine.map((fakeBit, bitIndex) => {
+                const bitDOM = document.createElement('div')
+                bitDOM.classList.add(bitsCommonClassName)
+                // bitDOM.classList.add(classNameOfEmptyBit)
+                bitDOM.addEventListener('click', () => {
+                    this.onCodeBitClicked(borderIndex, bitIndex, bitDOM)
+                })
+
+                borderDOM.appendChild(bitDOM)
+
+                return bitDOM
+            })
+        })
+
+        this.el.bitDOMs = bitDOMs
+    },
+
+    $updateOneBitDOM(bitDOM, bitNewState) {
+        const bitOldState = bitDOM.dataset.state
+        console.log(`${bitOldState} --> ${bitNewState}`)
+        if (bitOldState === bitNewState) {
+            return
+        }
+
+        // dataset state 和 className 故意相同，以简化处理。
+        const classNameOfOldState = bitOldState
+        const classNameOfNewState = bitNewState
+
+        bitDOM.dataset.state = bitNewState
+        bitDOM.classList.remove(classNameOfOldState)
+        bitDOM.classList.add(classNameOfNewState)
+    },
+
+    onCodeBitClicked(borderIndex, bitIndex, bitDOM) {
+        const {
+            cardBitEmpty: classNameOfEmptyBit,
+            cardBitFilled: classNameOfFilledBit
+        } = this.classNames
+
+        // dataset state 和 className 故意相同，以简化处理。
+        const valueOfEmptyState = classNameOfEmptyBit
+        const valueOfFilledState = classNameOfFilledBit
+
+        const bitOldState = bitDOM.dataset.state
+        let bitNewState
+        if (bitOldState === valueOfEmptyState) {
+            bitNewState = valueOfFilledState
+        } else {
+            bitNewState = valueOfEmptyState
+        }
+
+        console.log(borderIndex, bitIndex, bitDOM)
+        this.$updateOneBitDOM(bitDOM, bitNewState)
+    },
+
+    $updateCardCodeDOMs(cardCodesToShow, cardCodeName) {
+        if (!Array.isArray(cardCodesToShow) || cardCodesToShow.length !== 4) {
+            console.error('Invalid code setup')
+            return
+        }
+
+        const shouldPrintCodesInConsole = true
+        if (shouldPrintCodesInConsole) {
+            this.$printCodeArray('Applying codes:', cardCodesToShow)
+        }
+
+
+        let backgroundImageURL = ''
+        if (cardCodeName && cardCodeName !== 'new random code') {
+            backgroundImageURL = `url(${window.jiJiaPreviewImageURLsPrefix}/${cardCodeName}.jpg)`
+        }
+
+
+
+
+        const { el } = this
+        const { bitDOMs, cardPreviewDOM } = el
+
+        cardPreviewDOM.style.backgroundImage = backgroundImageURL
+
+
+        const {
+            cardBitEmpty: classNameOfEmptyBit,
+            cardBitFilled: classNameOfFilledBit
+        } = this.classNames
+
+        // dataset state 和 className 故意相同，以简化处理。
+        const valueOfEmptyState = classNameOfEmptyBit
+        const valueOfFilledState = classNameOfFilledBit
+
+        cardCodesToShow.forEach((cardBorderSetup, borderIndex) => {
+            cardBorderSetup.forEach((bitValue, bitIndex) => {
+                const bitDOM = bitDOMs[borderIndex][bitIndex]
+                const bitNewState = bitValue ? valueOfFilledState : valueOfEmptyState
+                this.$updateOneBitDOM(bitDOM, bitNewState)
+            })
+        })
+    },
+
     startInterval() {
         if (this.status.intervalId) { return }
 
@@ -248,18 +370,6 @@ window.cardCodesManager = {
     stopInterval() {
         if (isNaN(this.status.intervalId)) { return }
         clearInterval(this.status.intervalId)
-    },
-
-    clearCardBorders() {
-        const { classNames, el } = this
-        const rootDOM = el.root
-        const borderDotDOMs = Array.prototype.slice.apply(
-            rootDOM.querySelectorAll(
-                `.${classNames.bordersCommon} .${classNames.borderDotsCommon}`
-            )
-        )
-
-        borderDotDOMs.forEach(dom => dom.parentNode.removeChild(dom))
     },
 
     buildCardBordersViaKnownCardCodeName(cardCodeName) {
@@ -317,7 +427,7 @@ window.cardCodesManager = {
     gotoPrevTriedRandomCodes() {
         this.gotoTriedRandomCodesOfIndex(this.status.triedCodesShowingIndex - 1)
     },
-    
+
     gotoNextTriedRandomCodes() {
         this.gotoTriedRandomCodesOfIndex(this.status.triedCodesShowingIndex + 1)
     },
@@ -346,47 +456,6 @@ window.cardCodesManager = {
             buttonForShowingNextTriedRandomCode.disabled = currentIndex >= existingCodesCount - 1
         }
     },
-
-    $updateCardCodeDOMs(cardCodesToShow, cardCodeName) {
-        this.clearCardBorders()
-        const { classNames, el } = this
-        const rootDOM = el.root
-
-        if (!Array.isArray(cardCodesToShow) || cardCodesToShow.length !== 4) {
-            console.error('Invalid code setup')
-            return
-        }
-
-        const shouldPrintCodesInConsole = true
-        if (shouldPrintCodesInConsole) {
-            this.$printCodeArray('Applying codes:', cardCodesToShow)
-        }
-
-
-        let backgroundImageURL = ''
-        if (cardCodeName && cardCodeName !== 'new random code') {
-            backgroundImageURL = `url(${window.jiJiaPreviewImageURLsPrefix}/${cardCodeName}.jpg)`
-        }
-
-        el.cardPreviewDOM.style.backgroundImage = backgroundImageURL
-
-
-        cardCodesToShow.forEach((borderSetup, index) => {
-            const borderName = classNames.borderNames[index]
-            const borderDOM = rootDOM.querySelector(`.${classNames.bordersNamePrefix}${borderName}`)
-
-            borderSetup.map(bool => {
-                const borderDotDOM = document.createElement('div')
-                const classNameOfStatus = bool ?
-                    classNames.borderDotOfFilled :
-                    classNames.borderDotOfEmpty;
-
-                borderDotDOM.classList.add(classNames.borderDotsCommon)
-                borderDotDOM.classList.add(classNameOfStatus)
-                borderDOM.appendChild(borderDotDOM)
-            })
-        })
-    }
 }
 
 function generateRandomBooleanArray(count) {
