@@ -35,7 +35,6 @@
 
             if (succeeded) {
                 buildButtonsForApplyingKnownCardCodes()
-                bindMoreDOMEvents()
             }
 
             return succeeded
@@ -75,16 +74,6 @@
                 buttonDOM.appendChild(buttonLabelDOM)
                 buttonContainerDOM.appendChild(buttonDOM)
             })
-        }
-
-        function bindMoreDOMEvents() {
-            const bodyDOM = document.body
-            const buttonDOMForNewTry = bodyDOM.querySelector('.button-for-trying-another-random-card-code')
-            if (buttonDOMForNewTry) {
-                buttonDOMForNewTry.addEventListener('click', function (event) {
-                    cardCodesManager.buildCardBordersViaRandomCodes()
-                })
-            }
         }
     }
 })()

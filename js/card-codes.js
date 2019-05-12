@@ -12,12 +12,14 @@ window.cardCodesManager = {
         root: '.card .frame',
         jiJiaPreview: '.card .frame .ji-jia-preview',
         valueSlotOfShowingIndexOfTriedRandomCodes: '.value-slot-for-showing-index-of-tried-random-codes',
+        buttonTryAnotherRandomCardCode: '.button-for-trying-another-random-card-code',
         buttonShowPrevTriedRandomCode: '.button-for-going-to-prev-random-card-code',
         buttonShowNextTriedRandomCode: '.button-for-going-to-next-random-card-code',
     },
 
     options: {
         intervalInSeconds: 6,
+        $randomCardCodeName: 'new random code',
     },
 
     el: {
@@ -35,7 +37,7 @@ window.cardCodesManager = {
     status: {
         intervalId: NaN,
         isShowingRandomCodes: false,
-        triedCodesShowingIndex: 0,
+        triedCodesShowingIndex: NaN,
     },
 
     init({
@@ -50,7 +52,7 @@ window.cardCodesManager = {
         if (!rootDOM) {
             console.error(`Failed to get DOM root via selector "${
                 domSelectors.root
-            }.`)
+            }".`)
             return false
         }
 
@@ -58,7 +60,15 @@ window.cardCodesManager = {
         if (!cardPreviewDOM) {
             console.error(`Failed to get DOM via selector "${
                 domSelectors.jiJiaPreview
-            }.`)
+            }".`)
+            return false
+        }
+
+        const buttonDOMForTryingAnotherRandomCardCode = document.querySelector(domSelectors.buttonTryAnotherRandomCardCode)
+        if (!buttonDOMForTryingAnotherRandomCardCode) {
+            console.error(`Failed to get DOM via selector "${
+                domSelectors.buttonTryAnotherRandomCardCode
+            }".`)
             return false
         }
 
@@ -66,7 +76,7 @@ window.cardCodesManager = {
         if (!buttonDOMForShowingPrevTriedRandomCode) {
             console.error(`Failed to get DOM via selector "${
                 domSelectors.buttonShowPrevTriedRandomCode
-            }.`)
+            }".`)
             return false
         }
 
@@ -74,7 +84,7 @@ window.cardCodesManager = {
         if (!buttonDOMForShowingNextTriedRandomCode) {
             console.error(`Failed to get DOM via selector "${
                 domSelectors.buttonShowNextTriedRandomCode
-            }.`)
+            }".`)
             return false
         }
 
@@ -82,12 +92,13 @@ window.cardCodesManager = {
         if (!valueSlotDOM) {
             console.error(`Failed to get DOM via selector "${
                 domSelectors.valueSlotOfShowingIndexOfTriedRandomCodes
-            }.`)
+            }".`)
             return false
         }
 
         el.root = rootDOM
         el.cardPreviewDOM = cardPreviewDOM
+        el.buttonForTryingAnotherRandomCardCode = buttonDOMForTryingAnotherRandomCardCode
         el.buttonForShowingPrevTriedRandomCode = buttonDOMForShowingPrevTriedRandomCode
         el.buttonForShowingNextTriedRandomCode = buttonDOMForShowingNextTriedRandomCode
         el.valueSlotOfShowingIndexOfTriedRandomCodes = valueSlotDOM
@@ -96,6 +107,10 @@ window.cardCodesManager = {
         this.parseRawKnownCardCodes(knownCardCodeStrings)
         this.buildCardBordersViaKnownCardCodeName(initialKnownCardCodeName)
         this.$updateTriedRandomCodesUIStatus(0)
+
+        buttonDOMForTryingAnotherRandomCardCode.addEventListener('click', this.buildCardBordersViaRandomCodes.bind(this))
+        buttonDOMForShowingPrevTriedRandomCode.addEventListener('click', this.gotoPrevTriedRandomCodes.bind(this))
+        buttonDOMForShowingNextTriedRandomCode.addEventListener('click', this.gotoNextTriedRandomCodes.bind(this))
 
         intervalInSeconds = parseFloat(intervalInSeconds)
         if (intervalInSeconds > 0) {
@@ -248,46 +263,54 @@ window.cardCodesManager = {
     },
 
     buildCardBordersViaKnownCardCodeName(cardCodeName) {
-        const borderDotsSetups = this.data.knownCardCodes[cardCodeName]
-        if (borderDotsSetups) {
-            this.$updateCardCodeDOMs(borderDotsSetups, cardCodeName)
+        const cardCodes = this.data.knownCardCodes[cardCodeName]
+        if (cardCodes) {
+            this.status.isShowingRandomCodes = false
+            this.$updateCardCodeDOMs(cardCodes, cardCodeName)
         }
     },
 
     buildCardBordersViaRandomCodes() {
-        const borderDotsSetups = [
+        const randomCardCodes = [
             generateRandomBooleanArray(9),
             generateRandomBooleanArray(9),
             generateRandomBooleanArray(9),
             generateRandomBooleanArray(9),
         ]
 
-        // this.$printCodeArray('random codes (before applying fixed values):', borderDotsSetups)
+        // this.$printCodeArray('random codes (before applying fixed values):', randomCardCodes)
         const { fixedBits } = this.data
         if (fixedBits) {
             fixedBits.forEach((border, borderIndex) => {
                 border.forEach((bit, bitIndex) => {
                     if (bit !== undefined) {
-                        borderDotsSetups[borderIndex][bitIndex] = bit
+                        randomCardCodes[borderIndex][bitIndex] = bit
                     }
                 })
             })
         }
-        // this.$printCodeArray('random codes (after applying fixed values):', borderDotsSetups)
+        // this.$printCodeArray('random codes (after applying fixed values):', randomCardCodes)
 
 
-        const cardCodeName = 'new random code'
-
-        this.$updateCardCodeDOMs(borderDotsSetups, cardCodeName)
-        this.data.triedCodes.push(borderDotsSetups)
+        const cardCodeName = this.options.$randomCardCodeName
+        this.data.triedCodes.push(randomCardCodes)
+        this.gotoTriedRandomCodesOfIndex(this.data.triedCodes.length - 1)
     },
 
     gotoTriedRandomCodesOfIndex(desiredIndex) {
         const { triedCodes } = this.data
         const existingCodesCount = triedCodes.length
-        if (desiredIndex >= 0 && desiredIndex < existingCodesCount - 1) {
-            this.status.triedCodesShowingIndex = desiredIndex
-            this.status.isShowingRandomCodes = true
+        if (desiredIndex >= 0 && desiredIndex <= existingCodesCount - 1) {
+            const { status } = this
+            if (status.triedCodesShowingIndex !== desiredIndex || !status.isShowingRandomCodes) {
+                status.triedCodesShowingIndex = desiredIndex
+                status.isShowingRandomCodes = true
+                this.$updateTriedRandomCodesUIStatus()
+
+                const cardCodesToShow = triedCodes[desiredIndex]
+                const cardCodeName = this.options.$randomCardCodeName
+                this.$updateCardCodeDOMs(cardCodesToShow, cardCodeName)
+            }
         }
     },
 
@@ -311,33 +334,32 @@ window.cardCodesManager = {
         } = el
 
 
-        if (currentIndex === 0 && existingCodesCount === 0) {
+        if (existingCodesCount < 1) {
             valueSlotDOM.textContent = 'none'
             buttonForShowingPrevTriedRandomCode.disabled = true
             buttonForShowingNextTriedRandomCode.disabled = true
         } else if (currentIndex >= 0 && currentIndex <= existingCodesCount - 1) {
             const displayIndex = currentIndex + 1
-            valueSlotDOM.textContent = `${displayIndex}`
-            this.$updateCardCodeDOMs(borderDotsSetups, cardCodeName)
+            valueSlotDOM.textContent = `${displayIndex}/${existingCodesCount}`
 
-            buttonForShowingPrevTriedRandomCode.disabled = currentIndex === 0
-            buttonForShowingNextTriedRandomCode.disabled = existingCodesCount - 1
+            buttonForShowingPrevTriedRandomCode.disabled = currentIndex < 1
+            buttonForShowingNextTriedRandomCode.disabled = currentIndex >= existingCodesCount - 1
         }
     },
 
-    $updateCardCodeDOMs(borderDotsSetups, cardCodeName) {
+    $updateCardCodeDOMs(cardCodesToShow, cardCodeName) {
         this.clearCardBorders()
         const { classNames, el } = this
         const rootDOM = el.root
 
-        if (!Array.isArray(borderDotsSetups) || borderDotsSetups.length !== 4) {
+        if (!Array.isArray(cardCodesToShow) || cardCodesToShow.length !== 4) {
             console.error('Invalid code setup')
             return
         }
 
         const shouldPrintCodesInConsole = true
         if (shouldPrintCodesInConsole) {
-            this.$printCodeArray('Applying codes:', borderDotsSetups)
+            this.$printCodeArray('Applying codes:', cardCodesToShow)
         }
 
 
@@ -349,7 +371,7 @@ window.cardCodesManager = {
         el.cardPreviewDOM.style.backgroundImage = backgroundImageURL
 
 
-        borderDotsSetups.forEach((borderSetup, index) => {
+        cardCodesToShow.forEach((borderSetup, index) => {
             const borderName = classNames.borderNames[index]
             const borderDOM = rootDOM.querySelector(`.${classNames.bordersNamePrefix}${borderName}`)
 
