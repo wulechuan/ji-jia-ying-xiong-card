@@ -1,0 +1,198 @@
+html {
+    font-size: 20px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.controls {
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.ji-jia-preview {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%; 
+}
+
+button {
+    border-style: solid;
+    border-width: 2px;
+    border-color: #a8f;
+    border-radius: 0;
+    background-color: #efecff;
+    outline-offset: -2px;
+    transition-property: box-shadow, color, background, border-color;
+    transition-duration: 0.19s;
+    transition-timing-function: ease-out;
+}
+
+button:hover {
+    outline: solid 2px black;
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.3)
+}
+
+button:focus {
+    outline: solid 0.25rem black;
+}
+
+.button-for-trying-another-random-card-code {
+    position: relative;
+    width: 12rem;
+    height: 2rem;
+}
+
+.button-for-applying-known-card-code {
+    position: relative;
+    width: 8rem;
+    padding: 8rem 1rem 0.5rem 1rem;
+    height: 10rem;
+    margin: 1rem;
+}
+
+.button-for-applying-known-card-code .ji-jia-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0.5rem auto 0;
+    width: 7rem;
+    height: 7rem;
+    display: block;
+}
+
+.button-for-applying-known-card-code .label {
+    display: block;
+    text-align: center;
+}
+
+.card {
+    margin: 4rem auto;
+    width: 22rem;
+    height: 22rem;
+}
+
+.card .frame {
+    position: relative;
+    border-width: 1rem;
+    border-style: solid;
+    border-color: black;
+    width: 20rem;
+    height: 20rem;
+}
+
+
+.card .ji-jia-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    margin: 2rem;
+}
+
+.card .border {
+    width: 19rem;
+    height: 1.1rem;
+    padding-left: 1rem;
+    position: absolute;
+    transform-origin: left top;
+    display: flex;
+}
+
+.card .border-top {
+    left: 0;
+    top: 0;
+    margin-top: -0.1rem;
+}
+
+.card .border-right {
+    left: 100%;
+    top: 0;
+    margin-left: 0.1rem;
+    transform: rotate(90deg);
+}
+
+.card .border-bottom {
+    left: 100%;
+    top: 100%;
+    margin-top: 0.1rem;
+    transform: rotate(180deg);
+}
+
+.card .border-left {
+    left: 0;
+    top: 100%;
+    margin-left: -0.1rem;
+    transform: rotate(270deg);
+}
+
+.card .border-dot {
+    width: 2rem;
+    height: 1rem;
+    overflow: hidden;
+}
+
+.card .border-dot.filled::before {
+    content: '';
+    display: block;
+    width: 1.1rem;
+    height: 1.2rem;
+    left: 0;
+    top: 0;
+    margin: -0.1rem;
+    background-color: black;
+}
+
+.card .border-dot.empty {
+    background-color: transparent;
+}
+
+
+
+/* 测试代码起始于此 */
+/* .card .border {
+    transition-property: transform;
+    transition-duration: 0.6s;
+    transition-timing-function: linear;
+} */
+/* 
+.card .border-top {
+    background-color: pink;
+}
+
+.card .border-right {
+    background-color: lightyellow;
+}
+
+.card .border-bottom {
+    background-color: lightgreen;
+}
+
+.card .border-left {
+    background-color: lightblue;
+}
+
+.card .border-top .border-dot.filled {
+    background-color: red;
+}
+
+.card .border-right .border-dot.filled {
+    background-color: orange;
+}
+
+.card .border-bottom .border-dot.filled {
+    background-color: green;
+}
+
+.card .border-left .border-dot.filled {
+    background-color: blue;
+} */
+/* 测试代码完结于此 */
