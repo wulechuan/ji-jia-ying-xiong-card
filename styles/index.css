@@ -8,7 +8,9 @@ html {
 }
 
 #app h1 {
-    text-align: center
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: normal;
 }
 
 .controls {
@@ -74,7 +76,7 @@ button:disabled {
 .button-for-applying-known-card-code {
     position: relative;
     width: 8rem;
-    padding: 8rem 1rem 0.5rem 1rem;
+    padding: 8rem 0.2rem 0.5rem 0.2rem;
     height: 10rem;
     margin: 1rem;
 }
@@ -98,7 +100,7 @@ button:disabled {
 
 .value-slot-for-showing-index-of-tried-random-codes {
     display: inline-block;
-    width: 2.5rem;
+    width: 4rem;
     text-align: center;
 }
 
