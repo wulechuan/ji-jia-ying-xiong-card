@@ -1,6 +1,16 @@
-window.knownJiJiaRoleImageURLPrefix = 'images/ji-jia'
+window.jiJiaPreviewImageURLsPrefix = 'images/ji-jia'
 
-window.knownCardCodeStrings = {
+window.shouldStartIntervalForGeneratingRandomCardCodesAtBeginning = false
+window.intervalInSecondsForGeneratingRandomCardCodes = 1
+
+window.jiJiaCardCodesManuallyFixedBits = [
+    '10_1010_10',
+    null,
+    null,
+    null,
+]
+
+window.knownJiJiaCardCodeStrings = {
     '破坏者': [
         '100101011',
         '011111001',

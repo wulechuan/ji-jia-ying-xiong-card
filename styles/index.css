@@ -1,5 +1,5 @@
 html {
-    font-size: 20px;
+    font-size: 16px;
     width: 100%;
     min-height: 100%;
     display: flex;
@@ -29,6 +29,7 @@ button {
     transition-property: box-shadow, color, background, border-color;
     transition-duration: 0.19s;
     transition-timing-function: ease-out;
+    cursor: pointer;
 }
 
 button:hover {
@@ -40,10 +41,30 @@ button:focus {
     outline: solid 0.25rem black;
 }
 
-.button-for-trying-another-random-card-code {
-    position: relative;
-    width: 12rem;
+button:disabled {
+    outline: none;
+    box-shadow: none;
+    background-color: #eee;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+
+.generation-controls {
+    margin: 1rem auto;
+}
+
+.generation-controls button {
     height: 2rem;
+    margin: 1rem;
+}
+
+.button-for-trying-another-random-card-code {
+    width: 12rem;
+}
+
+.button-for-going-to-prev-random-card-code,
+.button-for-going-to-next-random-card-code {
+    width: 6rem;
 }
 
 .button-for-applying-known-card-code {
@@ -68,6 +89,12 @@ button:focus {
 
 .button-for-applying-known-card-code .label {
     display: block;
+    text-align: center;
+}
+
+.value-slot-for-showing-index-of-tried-random-codes {
+    display: inline-block;
+    width: 2.5rem;
     text-align: center;
 }
 
@@ -96,6 +123,7 @@ button:focus {
     width: auto;
     height: auto;
     margin: 2rem;
+    opacity: 0.3;
 }
 
 .card .border {

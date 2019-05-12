@@ -18,7 +18,7 @@
 
 
     function startApp() {
-        const knownCardCodeStrings = window.knownCardCodeStrings
+        const knownCardCodeStrings = window.knownJiJiaCardCodeStrings
         initCardCodesManager()
 
 
@@ -29,7 +29,8 @@
             const succeeded = cardCodesManager.init({
                 knownCardCodeStrings: knownCardCodeStrings,
                 initialKnownCardCodeName: Object.keys(knownCardCodeStrings)[0],
-                shouldStartIntervalAtBeginning: false,
+                shouldStartIntervalAtBeginning: window.shouldStartIntervalForGeneratingRandomCardCodesAtBeginning,
+                intervalInSeconds: window.intervalInSecondsForGeneratingRandomCardCodes,
             })
 
             if (succeeded) {
@@ -47,7 +48,7 @@
                 return false
             }
 
-            const knownJiJiaRoleImageURLPrefix = window.knownJiJiaRoleImageURLPrefix
+            const jiJiaPreviewImageURLsPrefix = window.jiJiaPreviewImageURLsPrefix
 
             Object.keys(knownCardCodeStrings).forEach(cardCodeName => {
                 const buttonDOM = document.createElement('button')
@@ -56,7 +57,7 @@
 
                 buttonDOM.classList.add('button-for-applying-known-card-code')
 
-                const backgroundImageURL = `url(${knownJiJiaRoleImageURLPrefix}/${cardCodeName}.jpg)`
+                const backgroundImageURL = `url(${jiJiaPreviewImageURLsPrefix}/${cardCodeName}.jpg)`
                 buttonDOM.addEventListener('click', function (event) {
                     cardCodesManager.buildCardBordersViaKnownCardCodeName(cardCodeName)
                 })
