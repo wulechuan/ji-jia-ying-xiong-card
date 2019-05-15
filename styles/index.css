@@ -128,8 +128,9 @@ button:disabled {
     bottom: 0;
     width: auto;
     height: auto;
-    margin: 2rem;
+    margin: 3rem;
     opacity: 0.3;
+    filter: blur(0.5rem);
 }
 
 .card .border {
@@ -175,6 +176,18 @@ button:disabled {
     cursor: pointer;
 }
 
+.card .border-dot::before,
+.card .border-dot {
+    transition-property: width, height, color, background-color, opacity;
+    transition-timing-function: ease-out;
+    transition-duration: 0.12s;
+}
+
+.card .border-dot:hover::before,
+.card .border-dot:hover {
+    transition-duration: 0.22s;
+}
+
 .card .border-dot::before {
     content: '';
     display: block;
@@ -192,15 +205,20 @@ button:disabled {
 
 
 .card .border-dot:hover {
-    background-color: rgba(0, 0, 0, 0.05)
+    height: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.09)
+}
+
+.card .border-dot:hover::before {
+    height: 1.7rem;
 }
 
 .card .border-dot:hover.filled::before {
-    background-color: rgba(0, 0, 0, 0.05)
+    background-color: rgba(0, 0, 0, 0.79)
 }
 
 .card .border-dot:hover.empty::before {
-    background-color: rgba(0, 0, 0, 0.515)
+    background-color: rgba(0, 0, 0, 0.03)
 }
 
 
