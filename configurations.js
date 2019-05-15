@@ -4,11 +4,12 @@ window.shouldStartIntervalForGeneratingRandomCardCodesAtBeginning = false
 window.intervalInSecondsForGeneratingRandomCardCodes = 1
 
 window.jiJiaCardCodesManuallyFixedBits = [
-    '10_1010_10',
+    // '10_1010_10',
     null,
     null,
     null,
-]
+    null,
+].slice(0, 4)
 
 window.knownJiJiaCardCodeStrings = {
     '破坏者': [
