@@ -28,10 +28,10 @@ window.cardCodesManager = {
     },
 
     data: {
-        triedCodes: [],
-        manuallyFixedBits: null,
-        autoDetectedFixedBitsAcrossAllKnownCards: null,
-        fixedBits: null,
+        randomlyTriedCodes: [],
+        manuallyFixedBitsAcrossAllCodes: null,
+        autoDetectedFixedBitsAcrossAllKnownCodes: null,
+        finallyFixedBitsAcrossAllCodes: null,
     },
 
     status: {
@@ -156,15 +156,15 @@ window.cardCodesManager = {
 
         this.data.knownCardCodes = parsedKnownCardCodes
 
-        const manuallyFixedBits = window.jiJiaCardCodesManuallyFixedBits
-        let parsedManuallyFixedBits = null
-        if (manuallyFixedBits) {
-            parsedManuallyFixedBits = manuallyFixedBits.map(border => {
+        const manuallyFixedBitsAcrossAllCodes = window.jiJiaCardCodesManuallyFixedBitsAcrossAllCards
+        let parsedManuallyFixedBitsAcrossAllCards = null
+        if (manuallyFixedBitsAcrossAllCodes) {
+            parsedManuallyFixedBitsAcrossAllCards = manuallyFixedBitsAcrossAllCodes.map(border => {
                 if (!border) { return null }
                 return border.split('').map(bit => bit !== '_' ? bit : undefined)
             })
-            this.data.manuallyFixedBits = parsedManuallyFixedBits
-            this.$printCodeArray('Manually fixed bits:', parsedManuallyFixedBits)
+            this.data.manuallyFixedBitsAcrossAllCodes = parsedManuallyFixedBitsAcrossAllCards
+            this.$printCodeArray('Manually fixed bits:', parsedManuallyFixedBitsAcrossAllCards)
         }
 
         let autoDetectedFixedBits
@@ -200,15 +200,15 @@ window.cardCodesManager = {
             this.$printCodeArray('Consistent bits across all known codes:', autoDetectedFixedBits)
             console.log('Consistent bits count:', countOfConsistentBits)
 
-            this.data.autoDetectedFixedBitsAcrossAllKnownCards = autoDetectedFixedBits
+            this.data.autoDetectedFixedBitsAcrossAllKnownCodes = autoDetectedFixedBits
         }
 
-        if (parsedManuallyFixedBits || autoDetectedFixedBits) {
-            let fixedBits
+        if (parsedManuallyFixedBitsAcrossAllCards || autoDetectedFixedBits) {
+            let finallyFixedBitsAcrossAllCodes
 
-            if (parsedManuallyFixedBits && autoDetectedFixedBits) {
-                fixedBits = autoDetectedFixedBits.map((consistentBorder, borderIndex) => {
-                    const manuallyFixedBorder =  parsedManuallyFixedBits[borderIndex]
+            if (parsedManuallyFixedBitsAcrossAllCards && autoDetectedFixedBits) {
+                finallyFixedBitsAcrossAllCodes = autoDetectedFixedBits.map((consistentBorder, borderIndex) => {
+                    const manuallyFixedBorder =  parsedManuallyFixedBitsAcrossAllCards[borderIndex]
                     if (!manuallyFixedBorder) {
                         return consistentBorder
                     }
@@ -224,21 +224,21 @@ window.cardCodesManager = {
                         return undefined
                     })
                 })
-            } else if (parsedManuallyFixedBits) {
-               fixedBits = parsedManuallyFixedBits
+            } else if (parsedManuallyFixedBitsAcrossAllCards) {
+               finallyFixedBitsAcrossAllCodes = parsedManuallyFixedBitsAcrossAllCards
             } else {
-               fixedBits = autoDetectedFixedBits
+               finallyFixedBitsAcrossAllCodes = autoDetectedFixedBits
             }
 
-            const countOfFixedBits = fixedBits.reduce((_countOfFixedBits, border) => {
+            const countOfFixedBits = finallyFixedBitsAcrossAllCodes.reduce((_countOfFixedBits, border) => {
                 return _countOfFixedBits + border.reduce((_countOfFixedBitsInBorder, bit) => {
                     return _countOfFixedBitsInBorder + (bit === undefined ? 0 : 1)
                 }, 0)
             }, 0)
 
-            this.$printCodeArray('Decided fixed bits:', fixedBits)
+            this.$printCodeArray('Decided fixed bits:', finallyFixedBitsAcrossAllCodes)
             console.log('Fixed bits count:', countOfFixedBits, '\tvariable bits count:', 36 - countOfFixedBits)
-            this.data.fixedBits = fixedBits
+            this.data.finallyFixedBitsAcrossAllCodes = finallyFixedBitsAcrossAllCodes
         }
     },
 
@@ -388,9 +388,9 @@ window.cardCodesManager = {
         ]
 
         // this.$printCodeArray('random codes (before applying fixed values):', randomCardCodes)
-        const { fixedBits } = this.data
-        if (fixedBits) {
-            fixedBits.forEach((border, borderIndex) => {
+        const { finallyFixedBitsAcrossAllCodes } = this.data
+        if (finallyFixedBitsAcrossAllCodes) {
+            finallyFixedBitsAcrossAllCodes.forEach((border, borderIndex) => {
                 border.forEach((bit, bitIndex) => {
                     if (bit !== undefined) {
                         randomCardCodes[borderIndex][bitIndex] = bit
@@ -401,14 +401,14 @@ window.cardCodesManager = {
         // this.$printCodeArray('random codes (after applying fixed values):', randomCardCodes)
 
 
-        const cardCodeName = this.options.$randomCardCodeName
-        this.data.triedCodes.push(randomCardCodes)
-        this.gotoTriedRandomCodesOfIndex(this.data.triedCodes.length - 1)
+        // const cardCodeName = this.options.$randomCardCodeName
+        this.data.randomlyTriedCodes.push(randomCardCodes)
+        this.gotoTriedRandomCodesOfIndex(this.data.randomlyTriedCodes.length - 1)
     },
 
     gotoTriedRandomCodesOfIndex(desiredIndex) {
-        const { triedCodes } = this.data
-        const existingCodesCount = triedCodes.length
+        const { randomlyTriedCodes } = this.data
+        const existingCodesCount = randomlyTriedCodes.length
         if (desiredIndex >= 0 && desiredIndex <= existingCodesCount - 1) {
             const { status } = this
             if (status.triedCodesShowingIndex !== desiredIndex || !status.isShowingRandomCodes) {
@@ -416,7 +416,7 @@ window.cardCodesManager = {
                 status.isShowingRandomCodes = true
                 this.$updateTriedRandomCodesUIStatus()
 
-                const cardCodesToShow = triedCodes[desiredIndex]
+                const cardCodesToShow = randomlyTriedCodes[desiredIndex]
                 const cardCodeName = this.options.$randomCardCodeName
                 this.$updateCardCodeDOMs(cardCodesToShow, cardCodeName)
             }
@@ -433,8 +433,8 @@ window.cardCodesManager = {
 
     $updateTriedRandomCodesUIStatus() {
         const { el } = this
-        const { triedCodes } = this.data
-        const existingCodesCount = triedCodes.length
+        const { randomlyTriedCodes } = this.data
+        const existingCodesCount = randomlyTriedCodes.length
         const currentIndex = this.status.triedCodesShowingIndex
         const valueSlotDOM = el.valueSlotOfShowingIndexOfTriedRandomCodes
         const {
